@@ -92,7 +92,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "89045beb8a44aabe46f9";
+/******/ 	var hotCurrentHash = "bee642b8d7645b908921";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -746,7 +746,7 @@
 /******/
 /******/ 	// script path function
 /******/ 	function jsonpScriptSrc(chunkId) {
-/******/ 		return __webpack_require__.p + "" + ({"vendors~lodash":"vendors~lodash"}[chunkId]||chunkId) + ".js"
+/******/ 		return __webpack_require__.p + "" + ({}[chunkId]||chunkId) + ".js"
 /******/ 	}
 /******/
 /******/ 	// The require function
@@ -918,7 +918,7 @@
 /*! all exports used */
 /***/ (function(module, exports, __webpack_require__) {
 
-eval("function getComponent() {\n  return __webpack_require__.e(/*! import() | lodash */ \"vendors~lodash\").then(__webpack_require__.t.bind(null, /*! lodash */ \"./node_modules/_lodash@4.17.15@lodash/lodash.js\", 7)).then(({\n    default: _\n  }) => {\n    var element = document.createElement('div');\n    element.innerHTML = _.join(['Dell', 'Lee'], '-');\n    return element;\n  });\n} // 代码分割，和webpack无关\n// webpack中实现代码分割，两种方式\n// 1. 同步代码： 只需要在webpack.common.js中做optimization的配置即可,chunks:all\n// 2. 异步代码(import): 异步代码，无需做任何配置，会自动进行代码分割，放置到新的文件中,chunks:async(默认)\n\n\ndocument.addEventListener('click', () => {\n  getComponent().then(element => {\n    document.body.appendChild(element);\n  });\n});//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvaW5kZXguanMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvaW5kZXguanM/YjYzNSJdLCJzb3VyY2VzQ29udGVudCI6WyJmdW5jdGlvbiBnZXRDb21wb25lbnQoKSB7XG5cdHJldHVybiBpbXBvcnQoLyp3ZWJwYWNrQ2h1bmtOYW1lOlwibG9kYXNoXCIqLyAnbG9kYXNoJykudGhlbigoeyBkZWZhdWx0OiBfIH0pID0+IHtcblx0XHR2YXIgZWxlbWVudCA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO1xuXHRcdGVsZW1lbnQuaW5uZXJIVE1MID0gXy5qb2luKFsnRGVsbCcsICdMZWUnXSwgJy0nKTtcblx0XHRyZXR1cm4gZWxlbWVudDtcblx0fSlcbn1cblxuXG4vLyDku6PnoIHliIblibLvvIzlkox3ZWJwYWNr5peg5YWzXG4vLyB3ZWJwYWNr5Lit5a6e546w5Luj56CB5YiG5Ymy77yM5Lik56eN5pa55byPXG4vLyAxLiDlkIzmraXku6PnoIHvvJog5Y+q6ZyA6KaB5Zyod2VicGFjay5jb21tb24uanPkuK3lgZpvcHRpbWl6YXRpb27nmoTphY3nva7ljbPlj68sY2h1bmtzOmFsbFxuLy8gMi4g5byC5q2l5Luj56CBKGltcG9ydCk6IOW8guatpeS7o+egge+8jOaXoOmcgOWBmuS7u+S9lemFjee9ru+8jOS8muiHquWKqOi/m+ihjOS7o+eggeWIhuWJsu+8jOaUvue9ruWIsOaWsOeahOaWh+S7tuS4rSxjaHVua3M6YXN5bmMo6buY6K6kKVxuXG5kb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsKCk9PntcbiAgZ2V0Q29tcG9uZW50KCkudGhlbihlbGVtZW50ID0+IHtcbiAgICBkb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkKGVsZW1lbnQpO1xuICB9KTtcbn0pIl0sIm1hcHBpbmdzIjoiQUFBQTtBQUNBLG9MQUFBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///./src/index.js\n");
+eval("document.addEventListener('click', () => {\n  __webpack_require__.e(/*! import() */ 0).then(__webpack_require__.t.bind(null, /*! ./click */ \"./src/click.js\", 7)).then(({\n    default: func\n  }) => {\n    func();\n  });\n});//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvaW5kZXguanMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvaW5kZXguanM/YjYzNSJdLCJzb3VyY2VzQ29udGVudCI6WyJcblxuXG5cbmRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJywoKT0+e1xuICBpbXBvcnQoJy4vY2xpY2snKS50aGVuKCgge2RlZmF1bHQ6IGZ1bmN9ICk9Pntcblx0XHRmdW5jKClcblx0fSlcbn0pXG5cbiJdLCJtYXBwaW5ncyI6IkFBSUE7QUFDQTtBQUFBO0FBQUE7QUFDQTtBQUNBO0FBQ0EiLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./src/index.js\n");
 
 /***/ })
 
