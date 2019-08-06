@@ -1,0 +1,9 @@
+.bg{
+  height: 100px;
+  width: 300px;
+  transform: translate(100px,100px);
+}
+
+div:nth-of-type(odd) {
+  background: blue;
+}
