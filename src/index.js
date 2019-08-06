@@ -1,28 +1,24 @@
-import { sayHello } from './module'; //TreeShaking
-import pic from './file.jpg'; 
-import style from './index.css';
-// import "@babel/polyfill"; //ES6函数转换
-import _ from 'loadsh'
+function getComponent() {
 
-// import './index.css'
+  //CodeSplit打包文件名为cacheGruop名加上分隔符再加上打包后所归属的js文件
 
-const bgImg = document.querySelector('.bg-img');
-var img = new Image();
-img.src = pic;
+	return import(/*webpackChunkName:"lodash"*/ 'lodash').then(({ default: _ }) => {
+		var element = document.createElement('div');
+		element.innerHTML = _.join(['Dell', 'Lee'], '-');
+		return element;
+	})
+}
 
-bgImg.appendChild(img);
-img.classList.add(style.bg);
 
-var btn = document.createElement('input');
-btn.innerText = 'click';
-document.body.appendChild(btn);
+// 代码分割，和webpack无关
+// webpack中实现代码分割，两种方式
+// 1. 同步代码： 只需要在webpack.common.js中做optimization的配置即可,chunks:all
+// 2. 异步代码(import): 异步代码，无需做任何配置，会自动进行代码分割，放置到新的文件中,chunks:async(默认)
 
-btn.addEventListener('click',function(){
-  var textDiv = document.createElement('div');
-  textDiv.innerText = 'add';
-  document.body.appendChild(textDiv);
+document.addEventListener('click',()=>{
+  getComponent().then(element => {
+    document.body.appendChild(element);
+  });
 })
-// console.log('\n'+pic);
-sayHello();
 
-console.log(_.join(['a','b','c'],'***'))
+//异步导入库的时候会启用代码懒加载，即未使用的时候，不会加载vendors~lodash代码，这样页面首次加载快

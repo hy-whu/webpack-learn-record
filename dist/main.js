@@ -3,7 +3,7 @@
 /******/ 	function webpackJsonpCallback(data) {
 /******/ 		var chunkIds = data[0];
 /******/ 		var moreModules = data[1];
-/******/ 		var executeModules = data[2];
+/******/
 /******/
 /******/ 		// add "moreModules" to the modules object,
 /******/ 		// then flag all "chunkIds" as loaded and fire callback
@@ -26,29 +26,8 @@
 /******/ 			resolves.shift()();
 /******/ 		}
 /******/
-/******/ 		// add entry modules from loaded chunk to deferred list
-/******/ 		deferredModules.push.apply(deferredModules, executeModules || []);
-/******/
-/******/ 		// run deferred modules when all chunks ready
-/******/ 		return checkDeferredModules();
 /******/ 	};
-/******/ 	function checkDeferredModules() {
-/******/ 		var result;
-/******/ 		for(var i = 0; i < deferredModules.length; i++) {
-/******/ 			var deferredModule = deferredModules[i];
-/******/ 			var fulfilled = true;
-/******/ 			for(var j = 1; j < deferredModule.length; j++) {
-/******/ 				var depId = deferredModule[j];
-/******/ 				if(installedChunks[depId] !== 0) fulfilled = false;
-/******/ 			}
-/******/ 			if(fulfilled) {
-/******/ 				deferredModules.splice(i--, 1);
-/******/ 				result = __webpack_require__(__webpack_require__.s = deferredModule[0]);
-/******/ 			}
-/******/ 		}
 /******/
-/******/ 		return result;
-/******/ 	}
 /******/ 	function hotDisposeChunk(chunkId) {
 /******/ 		delete installedChunks[chunkId];
 /******/ 	}
@@ -113,7 +92,7 @@
 /******/
 /******/ 	var hotApplyOnUpdate = true;
 /******/ 	// eslint-disable-next-line no-unused-vars
-/******/ 	var hotCurrentHash = "c44bfd4cf275454f7664";
+/******/ 	var hotCurrentHash = "89045beb8a44aabe46f9";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule;
@@ -763,7 +742,12 @@
 /******/ 		"main": 0
 /******/ 	};
 /******/
-/******/ 	var deferredModules = [];
+/******/
+/******/
+/******/ 	// script path function
+/******/ 	function jsonpScriptSrc(chunkId) {
+/******/ 		return __webpack_require__.p + "" + ({"vendors~lodash":"vendors~lodash"}[chunkId]||chunkId) + ".js"
+/******/ 	}
 /******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
@@ -792,6 +776,67 @@
 /******/ 		return module.exports;
 /******/ 	}
 /******/
+/******/ 	// This file contains only the entry chunk.
+/******/ 	// The chunk loading function for additional chunks
+/******/ 	__webpack_require__.e = function requireEnsure(chunkId) {
+/******/ 		var promises = [];
+/******/
+/******/
+/******/ 		// JSONP chunk loading for javascript
+/******/
+/******/ 		var installedChunkData = installedChunks[chunkId];
+/******/ 		if(installedChunkData !== 0) { // 0 means "already installed".
+/******/
+/******/ 			// a Promise means "currently loading".
+/******/ 			if(installedChunkData) {
+/******/ 				promises.push(installedChunkData[2]);
+/******/ 			} else {
+/******/ 				// setup Promise in chunk cache
+/******/ 				var promise = new Promise(function(resolve, reject) {
+/******/ 					installedChunkData = installedChunks[chunkId] = [resolve, reject];
+/******/ 				});
+/******/ 				promises.push(installedChunkData[2] = promise);
+/******/
+/******/ 				// start chunk loading
+/******/ 				var script = document.createElement('script');
+/******/ 				var onScriptComplete;
+/******/
+/******/ 				script.charset = 'utf-8';
+/******/ 				script.timeout = 120;
+/******/ 				if (__webpack_require__.nc) {
+/******/ 					script.setAttribute("nonce", __webpack_require__.nc);
+/******/ 				}
+/******/ 				script.src = jsonpScriptSrc(chunkId);
+/******/
+/******/ 				// create error before stack unwound to get useful stacktrace later
+/******/ 				var error = new Error();
+/******/ 				onScriptComplete = function (event) {
+/******/ 					// avoid mem leaks in IE.
+/******/ 					script.onerror = script.onload = null;
+/******/ 					clearTimeout(timeout);
+/******/ 					var chunk = installedChunks[chunkId];
+/******/ 					if(chunk !== 0) {
+/******/ 						if(chunk) {
+/******/ 							var errorType = event && (event.type === 'load' ? 'missing' : event.type);
+/******/ 							var realSrc = event && event.target && event.target.src;
+/******/ 							error.message = 'Loading chunk ' + chunkId + ' failed.\n(' + errorType + ': ' + realSrc + ')';
+/******/ 							error.name = 'ChunkLoadError';
+/******/ 							error.type = errorType;
+/******/ 							error.request = realSrc;
+/******/ 							chunk[1](error);
+/******/ 						}
+/******/ 						installedChunks[chunkId] = undefined;
+/******/ 					}
+/******/ 				};
+/******/ 				var timeout = setTimeout(function(){
+/******/ 					onScriptComplete({ type: 'timeout', target: script });
+/******/ 				}, 120000);
+/******/ 				script.onerror = script.onload = onScriptComplete;
+/******/ 				document.head.appendChild(script);
+/******/ 			}
+/******/ 		}
+/******/ 		return Promise.all(promises);
+/******/ 	};
 /******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
@@ -845,6 +890,9 @@
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
 /******/
+/******/ 	// on error function for async loading
+/******/ 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
+/******/
 /******/ 	// __webpack_hash__
 /******/ 	__webpack_require__.h = function() { return hotCurrentHash; };
 /******/
@@ -856,72 +904,21 @@
 /******/ 	var parentJsonpFunction = oldJsonpFunction;
 /******/
 /******/
-/******/ 	// add entry module to deferred list
-/******/ 	deferredModules.push(["./src/index.js","vendors~main"]);
-/******/ 	// run deferred modules when ready
-/******/ 	return checkDeferredModules();
+/******/ 	// Load entry module and return exports
+/******/ 	return hotCreateRequire("./src/index.js")(__webpack_require__.s = "./src/index.js");
 /******/ })
 /************************************************************************/
 /******/ ({
-
-/***/ "./node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js?!./node_modules/_postcss-loader@3.0.0@postcss-loader/src/index.js!./src/index.css":
-/*!*************************************************************************************************************************************************!*\
-  !*** ./node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js??ref--5-1!./node_modules/_postcss-loader@3.0.0@postcss-loader/src!./src/index.css ***!
-  \*************************************************************************************************************************************************/
-/*! no static exports found */
-/*! all exports used */
-/***/ (function(module, exports, __webpack_require__) {
-
-eval("exports = module.exports = __webpack_require__(/*! ../node_modules/_css-loader@3.1.0@css-loader/dist/runtime/api.js */ \"./node_modules/_css-loader@3.1.0@css-loader/dist/runtime/api.js\")(false);\n// Module\nexports.push([module.i, \"._1Ew2tq3rLusero3Pp4uJ6l{\\n  height: 100px;\\n  width: 300px;\\n  transform: translate(100px,100px);\\n}\\n\\ndiv:nth-of-type(odd) {\\n  background: blue;\\n}\", \"\"]);\n// Exports\nexports.locals = {\n\t\"bg\": \"_1Ew2tq3rLusero3Pp4uJ6l\"\n};//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9ub2RlX21vZHVsZXMvX2Nzcy1sb2FkZXJAMy4xLjBAY3NzLWxvYWRlci9kaXN0L2Nqcy5qcz8hLi9ub2RlX21vZHVsZXMvX3Bvc3Rjc3MtbG9hZGVyQDMuMC4wQHBvc3Rjc3MtbG9hZGVyL3NyYy9pbmRleC5qcyEuL3NyYy9pbmRleC5jc3MuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvaW5kZXguY3NzPzQxNDUiXSwic291cmNlc0NvbnRlbnQiOlsiZXhwb3J0cyA9IG1vZHVsZS5leHBvcnRzID0gcmVxdWlyZShcIi4uL25vZGVfbW9kdWxlcy9fY3NzLWxvYWRlckAzLjEuMEBjc3MtbG9hZGVyL2Rpc3QvcnVudGltZS9hcGkuanNcIikoZmFsc2UpO1xuLy8gTW9kdWxlXG5leHBvcnRzLnB1c2goW21vZHVsZS5pZCwgXCIuXzFFdzJ0cTNyTHVzZXJvM1BwNHVKNmx7XFxuICBoZWlnaHQ6IDEwMHB4O1xcbiAgd2lkdGg6IDMwMHB4O1xcbiAgdHJhbnNmb3JtOiB0cmFuc2xhdGUoMTAwcHgsMTAwcHgpO1xcbn1cXG5cXG5kaXY6bnRoLW9mLXR5cGUob2RkKSB7XFxuICBiYWNrZ3JvdW5kOiBibHVlO1xcbn1cIiwgXCJcIl0pO1xuLy8gRXhwb3J0c1xuZXhwb3J0cy5sb2NhbHMgPSB7XG5cdFwiYmdcIjogXCJfMUV3MnRxM3JMdXNlcm8zUHA0dUo2bFwiXG59OyJdLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0EiLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js?!./node_modules/_postcss-loader@3.0.0@postcss-loader/src/index.js!./src/index.css\n");
-
-/***/ }),
-
-/***/ "./src/file.jpg":
-/*!**********************!*\
-  !*** ./src/file.jpg ***!
-  \**********************/
-/*! no static exports found */
-/*! exports used: default */
-/***/ (function(module, exports, __webpack_require__) {
-
-eval("module.exports = __webpack_require__.p + \"images/file_46539237a5b215f69e26fd8ad1605bb9.jpg\";//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvZmlsZS5qcGcuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvZmlsZS5qcGc/YWQ3NiJdLCJzb3VyY2VzQ29udGVudCI6WyJtb2R1bGUuZXhwb3J0cyA9IF9fd2VicGFja19wdWJsaWNfcGF0aF9fICsgXCJpbWFnZXMvZmlsZV80NjUzOTIzN2E1YjIxNWY2OWUyNmZkOGFkMTYwNWJiOS5qcGdcIjsiXSwibWFwcGluZ3MiOiJBQUFBIiwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///./src/file.jpg\n");
-
-/***/ }),
-
-/***/ "./src/index.css":
-/*!***********************!*\
-  !*** ./src/index.css ***!
-  \***********************/
-/*! no static exports found */
-/*! exports used: default */
-/***/ (function(module, exports, __webpack_require__) {
-
-eval("\nvar content = __webpack_require__(/*! !../node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js??ref--5-1!../node_modules/_postcss-loader@3.0.0@postcss-loader/src!./index.css */ \"./node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js?!./node_modules/_postcss-loader@3.0.0@postcss-loader/src/index.js!./src/index.css\");\n\nif(typeof content === 'string') content = [[module.i, content, '']];\n\nvar transform;\nvar insertInto;\n\n\n\nvar options = {\"hmr\":true}\n\noptions.transform = transform\noptions.insertInto = undefined;\n\nvar update = __webpack_require__(/*! ../node_modules/_style-loader@0.23.1@style-loader/lib/addStyles.js */ \"./node_modules/_style-loader@0.23.1@style-loader/lib/addStyles.js\")(content, options);\n\nif(content.locals) module.exports = content.locals;\n\nif(true) {\n\tmodule.hot.accept(/*! !../node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js??ref--5-1!../node_modules/_postcss-loader@3.0.0@postcss-loader/src!./index.css */ \"./node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js?!./node_modules/_postcss-loader@3.0.0@postcss-loader/src/index.js!./src/index.css\", function() {\n\t\tvar newContent = __webpack_require__(/*! !../node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js??ref--5-1!../node_modules/_postcss-loader@3.0.0@postcss-loader/src!./index.css */ \"./node_modules/_css-loader@3.1.0@css-loader/dist/cjs.js?!./node_modules/_postcss-loader@3.0.0@postcss-loader/src/index.js!./src/index.css\");\n\n\t\tif(typeof newContent === 'string') newContent = [[module.i, newContent, '']];\n\n\t\tvar locals = (function(a, b) {\n\t\t\tvar key, idx = 0;\n\n\t\t\tfor(key in a) {\n\t\t\t\tif(!b || a[key] !== b[key]) return false;\n\t\t\t\tidx++;\n\t\t\t}\n\n\t\t\tfor(key in b) idx--;\n\n\t\t\treturn idx === 0;\n\t\t}(content.locals, newContent.locals));\n\n\t\tif(!locals) throw new Error('Aborting CSS HMR due to changed css-modules locals.');\n\n\t\tupdate(newContent);\n\t});\n\n\tmodule.hot.dispose(function() { update(); });\n}//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvaW5kZXguY3NzLmpzIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vLy4vc3JjL2luZGV4LmNzcz9mMmQ3Il0sInNvdXJjZXNDb250ZW50IjpbIlxudmFyIGNvbnRlbnQgPSByZXF1aXJlKFwiISEuLi9ub2RlX21vZHVsZXMvX2Nzcy1sb2FkZXJAMy4xLjBAY3NzLWxvYWRlci9kaXN0L2Nqcy5qcz8/cmVmLS01LTEhLi4vbm9kZV9tb2R1bGVzL19wb3N0Y3NzLWxvYWRlckAzLjAuMEBwb3N0Y3NzLWxvYWRlci9zcmMvaW5kZXguanMhLi9pbmRleC5jc3NcIik7XG5cbmlmKHR5cGVvZiBjb250ZW50ID09PSAnc3RyaW5nJykgY29udGVudCA9IFtbbW9kdWxlLmlkLCBjb250ZW50LCAnJ11dO1xuXG52YXIgdHJhbnNmb3JtO1xudmFyIGluc2VydEludG87XG5cblxuXG52YXIgb3B0aW9ucyA9IHtcImhtclwiOnRydWV9XG5cbm9wdGlvbnMudHJhbnNmb3JtID0gdHJhbnNmb3JtXG5vcHRpb25zLmluc2VydEludG8gPSB1bmRlZmluZWQ7XG5cbnZhciB1cGRhdGUgPSByZXF1aXJlKFwiIS4uL25vZGVfbW9kdWxlcy9fc3R5bGUtbG9hZGVyQDAuMjMuMUBzdHlsZS1sb2FkZXIvbGliL2FkZFN0eWxlcy5qc1wiKShjb250ZW50LCBvcHRpb25zKTtcblxuaWYoY29udGVudC5sb2NhbHMpIG1vZHVsZS5leHBvcnRzID0gY29udGVudC5sb2NhbHM7XG5cbmlmKG1vZHVsZS5ob3QpIHtcblx0bW9kdWxlLmhvdC5hY2NlcHQoXCIhIS4uL25vZGVfbW9kdWxlcy9fY3NzLWxvYWRlckAzLjEuMEBjc3MtbG9hZGVyL2Rpc3QvY2pzLmpzPz9yZWYtLTUtMSEuLi9ub2RlX21vZHVsZXMvX3Bvc3Rjc3MtbG9hZGVyQDMuMC4wQHBvc3Rjc3MtbG9hZGVyL3NyYy9pbmRleC5qcyEuL2luZGV4LmNzc1wiLCBmdW5jdGlvbigpIHtcblx0XHR2YXIgbmV3Q29udGVudCA9IHJlcXVpcmUoXCIhIS4uL25vZGVfbW9kdWxlcy9fY3NzLWxvYWRlckAzLjEuMEBjc3MtbG9hZGVyL2Rpc3QvY2pzLmpzPz9yZWYtLTUtMSEuLi9ub2RlX21vZHVsZXMvX3Bvc3Rjc3MtbG9hZGVyQDMuMC4wQHBvc3Rjc3MtbG9hZGVyL3NyYy9pbmRleC5qcyEuL2luZGV4LmNzc1wiKTtcblxuXHRcdGlmKHR5cGVvZiBuZXdDb250ZW50ID09PSAnc3RyaW5nJykgbmV3Q29udGVudCA9IFtbbW9kdWxlLmlkLCBuZXdDb250ZW50LCAnJ11dO1xuXG5cdFx0dmFyIGxvY2FscyA9IChmdW5jdGlvbihhLCBiKSB7XG5cdFx0XHR2YXIga2V5LCBpZHggPSAwO1xuXG5cdFx0XHRmb3Ioa2V5IGluIGEpIHtcblx0XHRcdFx0aWYoIWIgfHwgYVtrZXldICE9PSBiW2tleV0pIHJldHVybiBmYWxzZTtcblx0XHRcdFx0aWR4Kys7XG5cdFx0XHR9XG5cblx0XHRcdGZvcihrZXkgaW4gYikgaWR4LS07XG5cblx0XHRcdHJldHVybiBpZHggPT09IDA7XG5cdFx0fShjb250ZW50LmxvY2FscywgbmV3Q29udGVudC5sb2NhbHMpKTtcblxuXHRcdGlmKCFsb2NhbHMpIHRocm93IG5ldyBFcnJvcignQWJvcnRpbmcgQ1NTIEhNUiBkdWUgdG8gY2hhbmdlZCBjc3MtbW9kdWxlcyBsb2NhbHMuJyk7XG5cblx0XHR1cGRhdGUobmV3Q29udGVudCk7XG5cdH0pO1xuXG5cdG1vZHVsZS5ob3QuZGlzcG9zZShmdW5jdGlvbigpIHsgdXBkYXRlKCk7IH0pO1xufSJdLCJtYXBwaW5ncyI6IkFBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBIiwic291cmNlUm9vdCI6IiJ9\n//# sourceURL=webpack-internal:///./src/index.css\n");
-
-/***/ }),
 
 /***/ "./src/index.js":
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-/*! no exports provided */
-/*! all exports used */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _module__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./module */ \"./src/module.js\");\n/* harmony import */ var _module__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_module__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _file_jpg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./file.jpg */ \"./src/file.jpg\");\n/* harmony import */ var _file_jpg__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_file_jpg__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _index_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./index.css */ \"./src/index.css\");\n/* harmony import */ var _index_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_index_css__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var loadsh__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! loadsh */ \"./node_modules/_loadsh@0.0.4@loadsh/lodash.js\");\n/* harmony import */ var loadsh__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(loadsh__WEBPACK_IMPORTED_MODULE_3__);\n //TreeShaking\n\n\n // import \"@babel/polyfill\"; //ES6函数转换\n\n // import './index.css'\n\nconst bgImg = document.querySelector('.bg-img');\nvar img = new Image();\nimg.src = _file_jpg__WEBPACK_IMPORTED_MODULE_1___default.a;\nbgImg.appendChild(img);\nimg.classList.add(_index_css__WEBPACK_IMPORTED_MODULE_2___default.a.bg);\nvar btn = document.createElement('input');\nbtn.innerText = 'click';\ndocument.body.appendChild(btn);\nbtn.addEventListener('click', function () {\n  var textDiv = document.createElement('div');\n  textDiv.innerText = 'add';\n  document.body.appendChild(textDiv);\n}); // console.log('\\n'+pic);\n\nObject(_module__WEBPACK_IMPORTED_MODULE_0__[\"sayHello\"])();\nconsole.log(loadsh__WEBPACK_IMPORTED_MODULE_3___default.a.join(['a', 'b', 'c'], '***'));//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvaW5kZXguanMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvaW5kZXguanM/YjYzNSJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBzYXlIZWxsbyB9IGZyb20gJy4vbW9kdWxlJzsgLy9UcmVlU2hha2luZ1xuaW1wb3J0IHBpYyBmcm9tICcuL2ZpbGUuanBnJzsgXG5pbXBvcnQgc3R5bGUgZnJvbSAnLi9pbmRleC5jc3MnO1xuLy8gaW1wb3J0IFwiQGJhYmVsL3BvbHlmaWxsXCI7IC8vRVM25Ye95pWw6L2s5o2iXG5pbXBvcnQgXyBmcm9tICdsb2Fkc2gnXG5cbi8vIGltcG9ydCAnLi9pbmRleC5jc3MnXG5cbmNvbnN0IGJnSW1nID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvcignLmJnLWltZycpO1xudmFyIGltZyA9IG5ldyBJbWFnZSgpO1xuaW1nLnNyYyA9IHBpYztcblxuYmdJbWcuYXBwZW5kQ2hpbGQoaW1nKTtcbmltZy5jbGFzc0xpc3QuYWRkKHN0eWxlLmJnKTtcblxudmFyIGJ0biA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2lucHV0Jyk7XG5idG4uaW5uZXJUZXh0ID0gJ2NsaWNrJztcbmRvY3VtZW50LmJvZHkuYXBwZW5kQ2hpbGQoYnRuKTtcblxuYnRuLmFkZEV2ZW50TGlzdGVuZXIoJ2NsaWNrJyxmdW5jdGlvbigpe1xuICB2YXIgdGV4dERpdiA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO1xuICB0ZXh0RGl2LmlubmVyVGV4dCA9ICdhZGQnO1xuICBkb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkKHRleHREaXYpO1xufSlcbi8vIGNvbnNvbGUubG9nKCdcXG4nK3BpYyk7XG5zYXlIZWxsbygpO1xuXG5jb25zb2xlLmxvZyhfLmpvaW4oWydhJywnYicsJ2MnXSwnKioqJykpXG4iXSwibWFwcGluZ3MiOiJBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQUE7QUFBQTtBQUFBO0FBQ0E7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBR0E7QUFDQTtBQUNBO0FBRUE7QUFDQTtBQUVBO0FBQ0E7QUFDQTtBQUVBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBRUEiLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./src/index.js\n");
-
-/***/ }),
-
-/***/ "./src/module.js":
-/*!***********************!*\
-  !*** ./src/module.js ***!
-  \***********************/
 /*! no static exports found */
-/*! exports used: sayHello */
-/***/ (function(module, exports) {
+/*! all exports used */
+/***/ (function(module, exports, __webpack_require__) {
 
-eval("function sayHello() {\n  console.log('hello webpack!!!!!!!');\n}\n\nfunction add() {\n  console.log(\"add\");\n}\n\nfunction minus() {\n  console.log(\"minus\");\n}\n\nmodule.exports = {\n  sayHello,\n  add,\n  minus\n};//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvbW9kdWxlLmpzLmpzIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vLy4vc3JjL21vZHVsZS5qcz8xNThlIl0sInNvdXJjZXNDb250ZW50IjpbImZ1bmN0aW9uIHNheUhlbGxvICgpe1xuICBjb25zb2xlLmxvZygnaGVsbG8gd2VicGFjayEhISEhISEnKTtcbn1cblxuZnVuY3Rpb24gYWRkKCl7XG4gIGNvbnNvbGUubG9nKFwiYWRkXCIpO1xufVxuXG5cbmZ1bmN0aW9uIG1pbnVzKCl7XG4gIGNvbnNvbGUubG9nKFwibWludXNcIik7XG59XG5cbm1vZHVsZS5leHBvcnRzID0ge1xuICBzYXlIZWxsbyxcbiAgYWRkLFxuICBtaW51c1xufTsiXSwibWFwcGluZ3MiOiJBQUFBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFFQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBSEEiLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///./src/module.js\n");
+eval("function getComponent() {\n  return __webpack_require__.e(/*! import() | lodash */ \"vendors~lodash\").then(__webpack_require__.t.bind(null, /*! lodash */ \"./node_modules/_lodash@4.17.15@lodash/lodash.js\", 7)).then(({\n    default: _\n  }) => {\n    var element = document.createElement('div');\n    element.innerHTML = _.join(['Dell', 'Lee'], '-');\n    return element;\n  });\n} // 代码分割，和webpack无关\n// webpack中实现代码分割，两种方式\n// 1. 同步代码： 只需要在webpack.common.js中做optimization的配置即可,chunks:all\n// 2. 异步代码(import): 异步代码，无需做任何配置，会自动进行代码分割，放置到新的文件中,chunks:async(默认)\n\n\ndocument.addEventListener('click', () => {\n  getComponent().then(element => {\n    document.body.appendChild(element);\n  });\n});//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiLi9zcmMvaW5kZXguanMuanMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly8vLi9zcmMvaW5kZXguanM/YjYzNSJdLCJzb3VyY2VzQ29udGVudCI6WyJmdW5jdGlvbiBnZXRDb21wb25lbnQoKSB7XG5cdHJldHVybiBpbXBvcnQoLyp3ZWJwYWNrQ2h1bmtOYW1lOlwibG9kYXNoXCIqLyAnbG9kYXNoJykudGhlbigoeyBkZWZhdWx0OiBfIH0pID0+IHtcblx0XHR2YXIgZWxlbWVudCA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoJ2RpdicpO1xuXHRcdGVsZW1lbnQuaW5uZXJIVE1MID0gXy5qb2luKFsnRGVsbCcsICdMZWUnXSwgJy0nKTtcblx0XHRyZXR1cm4gZWxlbWVudDtcblx0fSlcbn1cblxuXG4vLyDku6PnoIHliIblibLvvIzlkox3ZWJwYWNr5peg5YWzXG4vLyB3ZWJwYWNr5Lit5a6e546w5Luj56CB5YiG5Ymy77yM5Lik56eN5pa55byPXG4vLyAxLiDlkIzmraXku6PnoIHvvJog5Y+q6ZyA6KaB5Zyod2VicGFjay5jb21tb24uanPkuK3lgZpvcHRpbWl6YXRpb27nmoTphY3nva7ljbPlj68sY2h1bmtzOmFsbFxuLy8gMi4g5byC5q2l5Luj56CBKGltcG9ydCk6IOW8guatpeS7o+egge+8jOaXoOmcgOWBmuS7u+S9lemFjee9ru+8jOS8muiHquWKqOi/m+ihjOS7o+eggeWIhuWJsu+8jOaUvue9ruWIsOaWsOeahOaWh+S7tuS4rSxjaHVua3M6YXN5bmMo6buY6K6kKVxuXG5kb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdjbGljaycsKCk9PntcbiAgZ2V0Q29tcG9uZW50KCkudGhlbihlbGVtZW50ID0+IHtcbiAgICBkb2N1bWVudC5ib2R5LmFwcGVuZENoaWxkKGVsZW1lbnQpO1xuICB9KTtcbn0pIl0sIm1hcHBpbmdzIjoiQUFBQTtBQUNBLG9MQUFBO0FBQUE7QUFBQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQ0E7QUFJQTtBQUNBO0FBQ0E7QUFDQTtBQUNBO0FBQUE7QUFDQTtBQUNBO0FBQ0E7QUFDQSIsInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///./src/index.js\n");
 
 /***/ })
 

@@ -41,17 +41,6 @@ module.exports = {
       exclude: /node_modules/, //去掉node_modules里面的库
       loader: "babel-loader",
     }
-    // {
-    //   test: /\.(jpg|pbg|gif)$/,
-    //   use: {
-    //     loader: 'url-loader', //将图片转换为base64格式直接嵌入js文件中，适合比较小的图片
-    //     options: {
-    //       name: '[name]_[hash].[ext]',
-    //       outputPath: 'images/',
-    //       limit: 204800  //小于204800字节打包为base64，否则同file-loader
-    //     }
-    //   }
-    // }
   ]
   },
   plugins:[
@@ -64,7 +53,24 @@ module.exports = {
   ],
   optimization: {
     splitChunks: {
-      chunks: "all"
+      chunks: "all",
+      minSize: 30000, //表示当导入的包大于30k时做代码分离
+      minChunks: 1,  //导入的包必须被引用次数大于1
+      maxAsyncRequests: 5, //最大分割数
+      maxInitialRequests: 3,
+      automaticNameDelimiter: '-', //文件名分隔符
+      name: true,
+      cacheGroups: {  //
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10
+        },
+        default:{
+          priority: -20,
+          reuseExistingChunk: true, //如果某个库被打包过，则不会被重新打包，直接复用
+          filename: 'common.js'
+        }
+      }
     }
   },
   output: {
