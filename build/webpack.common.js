@@ -63,9 +63,12 @@ module.exports = {
     }),
   ],
   optimization: {
-    splitChunks: {
-      chunks: "all"
-    }
+    usedExports: true 
+    // 配置treeshaking 
+    // 同时package.json中需要设置sideEffect: false
+    //设置为false，代表treeshaking忽略所有你所导入但未使用的类库（babel polyfill...）
+    //设置为true或者具体的['@babel/polyfill']代表对全部或者部分导入不做treeshaking
+    //但如果mode设置为production，则无需配置optimization，treeshaking直接生效
   },
   output: {
     // publicPath: 'http://yourcdnsite.com',  //方便添加cdn
