@@ -18,19 +18,6 @@ module.exports = {
           outputPath: 'images/'
         }
       }
-    },{
-      test: /\.css$/,
-      use: [
-        'style-loader',
-        {
-          loader: 'css-loader',
-          options: {
-            importLoaders: 2,
-            modules: true
-          }
-        },
-        'postcss-loader'
-      ]
     },
     {
       test: /\.(eot|ttf|svg)$/,
@@ -63,13 +50,16 @@ module.exports = {
     }),
   ],
   optimization: {
+    usedExports: true ,//tree Shaking
     splitChunks: {
       chunks: "all"
     }
   },
+ 
   output: {
     // publicPath: 'http://yourcdnsite.com',  //方便添加cdn
     filename: '[name].js',
+    chunkFilename: '[name].chunk.js',
     path: path.resolve(__dirname, '../dist') //绝对路径
   }
 }

@@ -12,13 +12,28 @@ const devConfig = {
     hot: true,
     hotOnly: true
   },
-  
+  module:{
+    rules:[
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 2,
+              modules: true
+            }
+          },
+          'postcss-loader'
+        ]
+      },
+    ]
+  },
   plugins:[
     new webpack.HotModuleReplacementPlugin(),
   ],
-  optimization: {
-    usedExports: true
-  },
+ 
   
 }
 
