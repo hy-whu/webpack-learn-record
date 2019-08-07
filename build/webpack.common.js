@@ -58,8 +58,7 @@ module.exports = {
  
   output: {
     // publicPath: 'http://yourcdnsite.com',  //方便添加cdn
-    filename: '[name].js',
-    chunkFilename: '[name].chunk.js',
+  
     path: path.resolve(__dirname, '../dist') //绝对路径
   }
 }

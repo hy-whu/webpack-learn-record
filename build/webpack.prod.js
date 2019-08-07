@@ -34,7 +34,11 @@ const prodConfig =  {
       filename: "[name].css",  //直接在index.html中被引用，走filename路径
       chunkFilename: '[name].chunk.css'
     })
-  ]
+  ],
+  output:{
+    filename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].js',
+  }
   
 }
 module.exports = merge(commonConfig,prodConfig)
