@@ -26,7 +26,11 @@ module.exports = {
     { 
       test: /\.js$/, 
       exclude: /node_modules/, //去掉node_modules里面的库
-      loader: "babel-loader",
+      use: [{
+        loader: 'babel-loader'
+      },{
+        loader: 'imports-loader?this=>window'  //更改this指向
+      }],
     }
     // {
     //   test: /\.(jpg|pbg|gif)$/,
@@ -48,6 +52,13 @@ module.exports = {
     new CleanWebpackPlugin({
       root: path.resolve(__dirname, '../')
     }),
+    new webpack.ProvidePlugin({
+      //在一些我们导入的类库中会有一些比较老的地方，不可以使用import导入所需要的依赖
+      //但是又必须有这些依赖才可以执行，我们知道ES6 module语法中模块间变量是无法共用的，
+      //那么我们就可以在这个插件配置全局变量，以供不同模块使用
+      $: 'jquery ',
+      _join: ['lodash','join']
+    })
   ],
   optimization: {
     usedExports: true ,//tree Shaking
