@@ -37,7 +37,7 @@ const prodConfig =  {
   ],
   output:{
     filename: '[name].[contenthash].js',
-    chunkFilename: '[name].[contenthash].js',
+    chunkFilename: '[name].[contenthash].js', //使用hash更新js文件时那么也会变更，浏览器知道重新请求更新页面而不是使用js缓存的文件
   }
   
 }
