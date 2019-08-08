@@ -1,0 +1,19 @@
+{
+  "name": "library",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/library.js",
+  "scripts": {
+    "build":"webpack"
+  },
+  "keywords": [],
+  "author": "yus",
+  "license": "MIT",
+  "devDependencies": {
+    "lodash": "^4.17.15",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6"
+  },
+  "dependencies": {
+  }
+}
