@@ -1,6 +1,3 @@
-import { sayHello } from './module'; //TreeShaking
-import pic from './file.jpg'; 
-import style from './index.css';
 // import "@babel/polyfill"; //ES6函数转换
 import _ from 'loadsh'
 

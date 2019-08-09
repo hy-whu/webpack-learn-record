@@ -39,7 +39,16 @@ module.exports = {
     { 
       test: /\.js$/, 
       exclude: /node_modules/, //去掉node_modules里面的库
-      loader: "babel-loader",
+      use: [
+        'babel-loader',
+        {
+          loader: 'eslint-loader',
+          options:{
+            fix: true,
+            force: 'pre'  //强制提前使用
+          }
+        }
+      ]
     }
     // {
     //   test: /\.(jpg|pbg|gif)$/,
