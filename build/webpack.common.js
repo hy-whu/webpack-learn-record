@@ -2,11 +2,18 @@ const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const webpack = require('webpack')
-
+const addAssetHtmlWebpackPlugin = require("add-asset-html-webpack-plugin")
 
 module.exports = {
   entry: {
     main: './src/index.js'
+  },
+  resolve:{
+    extensions:['.js','.jsx'],
+    mainFiles: ['index','child'], //当只import文件夹时，会帮你自动导入文件夹下以下名字的文件，但是一般不这样配置对性能不好
+    alias:{
+      ys: path.resolve(__dirname, '../src/')  //import ys from ys等同于import ys from './src/'路径比较长的时候配置别名
+    }
   },
   module: {
     rules: [{
@@ -70,6 +77,14 @@ module.exports = {
     new CleanWebpackPlugin({
       root: path.resolve(__dirname, '../')
     }),
+    new addAssetHtmlWebpackPlugin({  //为htmlwebpackPlugin注入资源
+      filepath: path.resolve(__dirname,'../dll/vendors.dll.js')
+    }),
+    new webpack.DllReferencePlugin({
+      manifest: path.resolve(__dirname,'../dll/[name].manifest.json')
+    })
+
+    
   ],
   optimization: {
     splitChunks: {

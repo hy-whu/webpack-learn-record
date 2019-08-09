@@ -8,7 +8,8 @@
     "dev-bulid": "webpack --config ./build/webpack.config.js",
     "dev": "webpack-dev-server --config ./build/webpack.config.js",
     "bulid": "webpack --config ./build/webpack.prod.js",
-    "middleware": "node server.js"
+    "middleware": "node server.js",
+    "build:dll": "webpack --config ./build/webpack.dll.js"
   },
   "author": "yusong hu",
   "license": "ISC",
@@ -16,6 +17,7 @@
     "@babel/core": "^7.5.5",
     "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
+    "add-asset-html-webpack-plugin": "^3.1.3",
     "autoprefixer": "^9.6.1",
     "babel-loader": "^8.0.6",
     "clean-webpack-plugin": "^3.0.0",
